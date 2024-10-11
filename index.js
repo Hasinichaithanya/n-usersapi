@@ -58,13 +58,24 @@ app.get("/get-users", (req, res) => {
 
 //adding user API
 app.post("/add-user", async (req, res) => {
-  const userDetails = req.body;
+ const userDetails = req.body;
   if (Object.keys(userDetails).length == 0)
-    return res.status(404).json({ message: "Cannot add empty user!" });
-  else {
-    const newUser = await User.create(userDetails);
-    return res.json({ newUser, Message: "Added successfully" });
-  }
+    return res.status(400).json({ message: "Cannot add empty user!" });
+  User.create(userDetails)
+    .then((response) => {
+      res.json({ response, Message: "Added successfully" });
+      console.log(response);
+    })
+    .catch((error) => {
+      if (error.name === "ValidationError") {
+        const validationErrors = {};
+        for (let key in error.errors) {
+          console.log(key);
+          validationErrors[key] = error.errors[key].message;
+        }
+        return res.status(400).json({ errors: validationErrors });
+      }
+    });
 });
 
 //update the user by id
