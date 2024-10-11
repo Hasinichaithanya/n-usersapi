@@ -82,7 +82,6 @@ app.post("/login", async (req, res) => {
   console.log(email, password);
   try {
     const user = await User.findOne({ email });
-
     console.log(user);
     if (user) {
       if (user.password === password) {
@@ -93,14 +92,21 @@ app.post("/login", async (req, res) => {
         res.status(401).json({ Message: "Incorrect password!" });
       }
     }  else {
+      
       res
         .status(404)
         .json({ Message: "User does not exist, register to login!" });
     }
     console.log(user);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ Message: "Internal Server Error" });
+ if (error.name === "ValidationError") {
+        const validationErrors = {};
+        for (let key in error.errors) {
+          console.log(key);
+          validationErrors[key] = error.errors[key].message;
+        }
+        return res.status(400).json({ errors: validationErrors });
+      }    res.status(500).json({ Message: "Internal Server Error" });
   }
 });
 //update the user by id
