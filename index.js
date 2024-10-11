@@ -77,7 +77,32 @@ app.post("/add-user", async (req, res) => {
       }
     });
 });
+app.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+  console.log(email, password);
+  try {
+    const user = await User.findOne({ email });
 
+    console.log(user);
+    if (user) {
+      if (user.password === password) {
+        res
+          .status(200)
+          .json({ Message: "Login Success!", user: "user", userId: user._id });
+      } else {
+        res.status(401).json({ Message: "Incorrect password!" });
+      }
+    }  else {
+      res
+        .status(404)
+        .json({ Message: "User does not exist, register to login!" });
+    }
+    console.log(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ Message: "Internal Server Error" });
+  }
+});
 //update the user by id
 app.put("/update-user/:id", async (req, res) => {
   const { id } = req.params;
