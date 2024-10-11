@@ -77,38 +77,71 @@ app.post("/add-user", async (req, res) => {
       }
     });
 });
+
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
+
+  if (!email || !password) {
+    return res.status(400).json({ message: "Email and password are required!" });
+  }
+
   try {
     const user = await User.findOne({ email });
-    console.log(user);
+
     if (user) {
       if (user.password === password) {
-        res
-          .status(200)
-          .json({ Message: "Login Success!", user: "user", userId: user._id });
+        return res.status(200).json({ message: "Login Success!", user, userId: user._id });
       } else {
-        res.status(401).json({ Message: "Incorrect password!" });
+        return res.status(401).json({ message: "Incorrect password!" });
       }
-    }  else {
-      
-      res
-        .status(404)
-        .json({ Message: "User does not exist, register to login!" });
+    } else {
+      return res.status(404).json({ message: "User does not exist, register to login!" });
     }
-    console.log(user);
-  } catch (err) {
- if (error.name === "ValidationError") {
-        const validationErrors = {};
-        for (let key in error.errors) {
-          console.log(key);
-          validationErrors[key] = error.errors[key].message;
-        }
-        return res.status(400).json({ errors: validationErrors });
-      }    res.status(500).json({ Message: "Internal Server Error" });
+  } catch (error) {
+    if (error.name === "ValidationError") {
+      const validationErrors = {};
+      for (let key in error.errors) {
+        validationErrors[key] = error.errors[key].message;
+      }
+      return res.status(400).json({ errors: validationErrors });
+    }
+
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
+// app.post("/login", async (req, res) => {
+//   const { email, password } = req.body;
+//   console.log(email, password);
+//   try {
+//     const user = await User.findOne({ email });
+//     console.log(user);
+//     if (user) {
+//       if (user.password === password) {
+//         res
+//           .status(200)
+//           .json({ Message: "Login Success!", user: "user", userId: user._id });
+//       } else {
+//         res.status(401).json({ Message: "Incorrect password!" });
+//       }
+//     }  else {
+      
+//       res
+//         .status(404)
+//         .json({ Message: "User does not exist, register to login!" });
+//     }
+//     console.log(user);
+//   } catch (err) {
+//  if (error.name === "ValidationError") {
+//         const validationErrors = {};
+//         for (let key in error.errors) {
+//           console.log(key);
+//           validationErrors[key] = error.errors[key].message;
+//         }
+//         return res.status(400).json({ errors: validationErrors });
+//       }    res.status(500).json({ Message: "Internal Server Error" });
+//   }
+// });
 //update the user by id
 app.put("/update-user/:id", async (req, res) => {
   const { id } = req.params;
