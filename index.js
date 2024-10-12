@@ -60,10 +60,10 @@ app.get("/get-users", (req, res) => {
 app.post("/add-user", async (req, res) => {
  const userDetails = req.body;
   if (Object.keys(userDetails).length == 0)
-    return res.status(400).json({ message: "Cannot add empty user!" });
+    return res.status(400).json({ message: "Cannot add empty user!" ,code: 400});
   User.create(userDetails)
     .then((response) => {
-      res.json({ response, Message: "Added successfully" });
+      res.json({ response, Message: "Added successfully",code: 200 });
       console.log(response);
     })
     .catch((error) => {
@@ -73,7 +73,7 @@ app.post("/add-user", async (req, res) => {
           console.log(key);
           validationErrors[key] = error.errors[key].message;
         }
-        return res.status(400).json({ errors: validationErrors });
+        return res.status(400).json({ errors: validationErrors ,code:403});
       }
     });
 });
@@ -82,7 +82,7 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required!" });
+    return res.status(400).json({ message: "Email and password are required!",code:400 });
   }
 
   try {
@@ -90,12 +90,12 @@ app.post("/login", async (req, res) => {
 
     if (user) {
       if (user.password === password) {
-        return res.status(200).json({ message: "Login Success!", user, userId: user._id });
+        return res.status(200).json({ message: "Login Success!", user, userId: user._id , code:200});
       } else {
-        return res.status(401).json({ message: "Incorrect password!" });
+        return res.status(401).json({ message: "Incorrect password!",code:402 });
       }
     } else {
-      return res.status(404).json({ message: "User does not exist, register to login!" });
+      return res.status(404).json({ message: "User does not exist, register to login!",code:404 });
     }
   } catch (error) {
     if (error.name === "ValidationError") {
@@ -103,7 +103,7 @@ app.post("/login", async (req, res) => {
       for (let key in error.errors) {
         validationErrors[key] = error.errors[key].message;
       }
-      return res.status(400).json({ errors: validationErrors });
+      return res.status(400).json({ errors: validationErrors,code:403 });
     }
 
     return res.status(500).json({ message: "Internal Server Error" });
