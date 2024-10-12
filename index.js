@@ -79,15 +79,15 @@ app.post("/add-user", async (req, res) => {
 });
 
 app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { mail, password } = req.body;
 
-  if (!email || !password) {
+  if (!mail || !password) {
     return res.status(400).json({ message: "Email and password are required!",code:400 });
   }
 
   try {
-    const user = await User.findOne({ email });
-
+    const user = await User.findOne({ mail });
+console.log(user);
     if (user) {
       if (user.password === password) {
         return res.status(200).json({ message: "Login Success!", user, userId: user._id , code:200});
